@@ -38,16 +38,20 @@
 
         $request = $GLOBALS["bdd"]->prepare($sql); // prepare la requete avant execution
         
-        $array = Array(":lastname" => $client["lastname"],":firstname" => $client["Firstname"],":email" => $client["email"],":phone" => $client["phonenumber"],":encrypte" => $client["password"]);
+        $array = Array(":lastname" => $client["lastname"],":firstname" => $client["Firstname"],":email" => $client["email"],":phone" => $client["phonenumber"],":encrypte" => cryptPassword($client["password"]));
 
         $request->execute($array); // execute la requete en remplacant les ? par les datas du tableau
 
         return $GLOBALS["bdd"]->lastInsertId();
     }
 
+    function cryptPassword($password){
+        $crypt = sha1(rand(11, 22)."Mike".uniqid()."Mike".rand(11, 22));
+        return crypt($password, $crypt);    
+    }
 
-
-
-
+    function comparePassword($hashed_password, $salt){
+       return (hash_equals($hashed_password, crypt($password, $hashed_password)))?true:false;     
+    }
 
 ?>
