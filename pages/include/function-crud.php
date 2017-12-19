@@ -87,4 +87,10 @@
         return $user;    
     }
 
+    function logout(){
+        setcookie("User", "", time()-3600);
+        unset($_COOKIE["User"]);
+        unset($_SESSION);
+        session_destroy();
+    }
 ?>

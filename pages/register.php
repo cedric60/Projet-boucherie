@@ -1,4 +1,9 @@
 <?php 
+    session_start();
+    if(isset($_SESSION["User"]))
+        header('location: index.php');  // redirection en PHP
+
+
     require_once "include/config.php";
     $message = "";
     if(!empty($_POST)){
@@ -40,10 +45,11 @@
             }
 
             if($retour == true){
-                $toto = registerClient($_POST);
-                var_dump($toto);
-                // header('location: index.html');
-                // exit;
+                $toto = registerClient($_POST); // Register user
+                $_POST["idclients"] = $id; // Add id to array POST
+                unset($_POST["password"]);  // Delete password to array
+                $_SESSION["User"] = $_POST; // Create session user
+                header('location: index.php');  // Redirection
             }
         endif;
     }

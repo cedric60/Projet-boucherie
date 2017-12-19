@@ -1,4 +1,13 @@
-<!DOCTYPE html>
+
+<?php 
+    session_start();
+    require("include/function-crud.php");
+    logout();
+
+    if(isset($_SESSION["User"]))
+        header('location: index.php');  // redirection en PHP
+
+?>
 <html lang="fr">
 
 <head>
@@ -78,10 +87,16 @@
                     dataType: "json"
                 })
                 .done(function( user ) {
-                    if(user.error)
-                        console.warn(user.message)
-                    else
-                        console.info(user)
+                    if(user.error){
+                        $("message").text(user.message);
+                        console.warn(user.message);
+                    }
+                    else{
+                        var date = new Date();
+                        date.setTime(date.getTime() + (2* 24 * 60 * 60 * 1000));
+                        document.cookie = "User="+JSON.stringify(user)+"; expires="+date.toUTCString(); //creation d'un cookie et utilisation de stringify pour mettre en chaine de caractere
+                        document.location.href="index.php";
+                    }
                 })
                 .fail(function( jqXHR, textStatus ) {
                     alert( "Request failed: " + textStatus );
