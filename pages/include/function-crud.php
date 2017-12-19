@@ -1,7 +1,12 @@
 <?php
 
     $message = false;
-
+/*
+// test fonction 
+    $hashed_password = cryptPassword("Mike");
+    $verif = comparePassword($hashed_password, "Mike");
+    var_dump($verif);
+*/
     $bdd = connectToDataBAse();
 
     require_once "config.php";
@@ -10,6 +15,7 @@
 
     function connectToDataBase(){
         try{
+            require_once "config.php";
             $bdd = new PDO('mysql:host='.DATABASE_HOST.';dbname='.DATABASE_NAME, DATABASE_USER, DATABASE_PASS); // Création d'une instance de connection à la base de donnée
             return $bdd;
         }catch (PDOException $e) {
@@ -50,8 +56,35 @@
         return crypt($password, $crypt);    
     }
 
-    function comparePassword($hashed_password, $salt){
-       return (hash_equals($hashed_password, crypt($password, $hashed_password)))?true:false;     
+    function comparePassword($hashed_password, $password){
+       return (hash_equals($hashed_password, crypt($password, $hashed_password))) ? true : false;     
+    }
+    function selectUserByEmail($email){
+
+        $sql = "SELECT * FROM `clients` WHERE email = ?"; // initianilisation de la requete (renvoi le nb de clients dont l'email = $email)
+        
+        $request = $GLOBALS["bdd"]->prepare($sql); // prepare la requete avant execution
+
+        $request->execute(Array($email)); // execute la requete en remplacant les ? par les datas du tableau
+
+        $array =  $request->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $array[0];
+    }
+
+    function connectUser($email, $password){
+
+        if (!emailExiste($email)){
+            return -1;
+        }
+
+        $user = selectUserByEmail($email);
+
+        if( !comparePassword($user["encrypte"], $password)){
+            return -2;
+        }
+        unset($user["encrypte"]); // supprimer un element d'un array
+        return $user;    
     }
 
 ?>
